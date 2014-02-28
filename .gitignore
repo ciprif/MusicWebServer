@@ -17,3 +17,4 @@ Backup/
 
 #Specific files
 UpgradeLog.htm
+*.suo
