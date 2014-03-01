@@ -79,21 +79,11 @@ namespace MusicManager
             {
                 if (extensions.Contains(file.Extension))
                 {
-<<<<<<< HEAD
                     registeredFiles.Add(new MusicFile(file));
-                    p.StartInfo.FileName = CLAmpLocation;
-                    p.StartInfo.Arguments = "/PLADD " + "\"" + file.FullName + "\"";
-                    p.StartInfo.RedirectStandardOutput = true;
-                    p.StartInfo.UseShellExecute = false;
-                    p.Start();
-
-                    Console.WriteLine(p.StandardOutput);
-=======
-                    registeredFiles.Add(new MusicFile(file as FileInfo));
                     try
                     {
                         p.StartInfo.FileName = CLAmpLocation;
-                        p.StartInfo.Arguments = "/PLADD " + "\"" + (file as FileInfo).FullName + "\"";
+                        p.StartInfo.Arguments = "/PLADD " + "\"" + file.FullName + "\"";
                         p.StartInfo.RedirectStandardOutput = true;
                         p.StartInfo.UseShellExecute = false;
                         p.StartInfo.CreateNoWindow = false;
@@ -106,7 +96,6 @@ namespace MusicManager
                             new StreamWriter(@"log.txt");
                         sw.WriteLine(e.Message);
                     } //suppress
->>>>>>> 741c9efdca11aea7bf32f5b57c77faf95c0efe21
                 }
             }
 
