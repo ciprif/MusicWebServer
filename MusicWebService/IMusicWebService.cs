@@ -17,6 +17,10 @@ namespace MusicWebService
         [OperationContract] 
         List<MusicFile> GetItems();
 
+        [WebGet(UriTemplate = "GetItemsPaged?page={page}&pageSize={pageSize}")]
+        [OperationContract]
+        IEnumerable<MusicFile> GetItemsPaged(int page, int pageSize);
+
         [WebGet(UriTemplate="items/{fileid}")]
         [OperationContract]
         MusicFileTagInfo GetItem(string fileid);

@@ -13,7 +13,7 @@ namespace MusicManager
 
     public interface IFileManager
     {
-        List<IFile> GetRegisteredFiles();
+        List<MusicFile> GetRegisteredFiles();
         FileInfo Find(String path);
     }
 }

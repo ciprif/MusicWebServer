@@ -9,22 +9,34 @@ using System.ServiceModel.Web;
 
 namespace MusicWebService
 {
-   [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
+    [ServiceBehavior(InstanceContextMode = InstanceContextMode.Single)]
     public class MusicWebService : IMusicWebService
     {
-       private MusicManager.MusicManager musicManager;
-       
-       private MusicWebService()
-       {
-           musicManager = MusicManager.MusicManager.GetInstance();
-       }
-       
+        private MusicManager.MusicManager musicManager;
+
+        private MusicWebService()
+        {
+            musicManager = MusicManager.MusicManager.GetInstance();
+        }
+
         private List<MusicFile> registeredFiles = null;
+
+        private List<MusicFile> RegisteredFiles
+        {
+            get
+            {
+                if (registeredFiles == null)
+                {
+                    registeredFiles = musicManager.GetRegisteredFiles();
+                }
+                return registeredFiles;
+            }
+        }
 
         public List<MusicFile> GetItems()
         {
             musicManager.UpdateItems();
-            registeredFiles = musicManager.GetRegisteredFiles().ConvertAll(x => (MusicFile)x);
+            registeredFiles = RegisteredFiles;
 
             WebOperationContext.Current.OutgoingResponse.Headers.Add("Access-Control-Allow-Origin", "*");
 
@@ -36,11 +48,6 @@ namespace MusicWebService
             Int64 id = -1;
             if (Int64.TryParse(fileId, out id))
             {
-                if (registeredFiles == null)
-                {
-                    registeredFiles = musicManager.GetRegisteredFiles().ConvertAll(x => (MusicFile)x);
-                }
-
                 WebOperationContext.Current.OutgoingResponse.Headers.Add("Access-Control-Allow-Origin", "*");
 
                 return MusicManager.MusicManager.CreateTagObject(id);
@@ -83,6 +90,24 @@ namespace MusicWebService
             WebOperationContext.Current.OutgoingResponse.Headers.Add("Access-Control-Allow-Origin", "*");
 
             musicManager.JumpToPos(percentage);
+        }
+
+        public IEnumerable<MusicFile> GetItemsPaged(int page, int pageSize)
+        {
+            if ((page - 1) * pageSize > RegisteredFiles.Count - 1)
+            {
+                throw new Exception("Request page exceeds the total item count.");
+            }
+
+            // compute currentPageSize, which might be smaller than pageSize if we are on the last page
+            var currentPageSize = pageSize;
+
+            if ((page - 1) * pageSize < RegisteredFiles.Count && RegisteredFiles.Count < (page) * pageSize)
+            {
+                currentPageSize = RegisteredFiles.Count - (page - 1) * pageSize;
+            }
+
+            return RegisteredFiles.Skip((page - 1) * pageSize).Take(currentPageSize);
         }
     }
 }

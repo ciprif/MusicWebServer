@@ -74,9 +74,9 @@ namespace MusicManager
             {
                 if (extensions.Contains(file.Extension))
                 {
-                    registeredFiles.Add(new MusicFile(file as FileInfo));
+                    registeredFiles.Add(new MusicFile(file));
                     p.StartInfo.FileName = CLAmpLocation;
-                    p.StartInfo.Arguments = "/PLADD " + "\"" + (file as FileInfo).FullName + "\"";
+                    p.StartInfo.Arguments = "/PLADD " + "\"" + file.FullName + "\"";
                     p.StartInfo.RedirectStandardOutput = true;
                     p.StartInfo.UseShellExecute = false;
                     p.Start();
@@ -91,9 +91,9 @@ namespace MusicManager
             }
         }
 
-        public List<IFile> GetRegisteredFiles()
+        public List<MusicFile> GetRegisteredFiles()
         {
-            return registeredFiles.ToList<IFile>();
+            return registeredFiles;
         }
 
         public System.IO.FileInfo Find(string path)
