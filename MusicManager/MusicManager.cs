@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows;
 using System.Timers;
+using System.Threading;
 
 namespace MusicManager
 {
@@ -18,7 +19,7 @@ namespace MusicManager
         private static Int64 ID = 0;
         private static string[] extensions = { ".mp3", ".wav", ".mp4" };
         private static Int64 currentID = 0;
-        private static Timer trackTimer = new Timer();
+        private static System.Timers.Timer trackTimer = new System.Timers.Timer();
 
         public static string RootDirectory { get; set; }
         public static string CLAmpLocation { get; set; }
@@ -35,11 +36,15 @@ namespace MusicManager
 
             if (IsDir(RootDirectory))
             {
-                System.Diagnostics.Process.Start(CLAmpLocation, "/START");
+                System.Diagnostics.Process p = new System.Diagnostics.Process();
+
+                p.StartInfo.FileName = CLAmpLocation;
+                p.StartInfo.Arguments = "/START" + " /PLCLEAR";
+                p.StartInfo.RedirectStandardOutput = true;
+                p.StartInfo.UseShellExecute = false;
+                p.Start();
 
                 rootDir = OpenDir(RootDirectory);
-
-                System.Diagnostics.Process.Start(CLAmpLocation, "/PLCLEAR");
 
                 PopulateList(rootDir);
 
@@ -75,13 +80,22 @@ namespace MusicManager
                 if (extensions.Contains(file.Extension))
                 {
                     registeredFiles.Add(new MusicFile(file as FileInfo));
-                    p.StartInfo.FileName = CLAmpLocation;
-                    p.StartInfo.Arguments = "/PLADD " + "\"" + (file as FileInfo).FullName + "\"";
-                    p.StartInfo.RedirectStandardOutput = true;
-                    p.StartInfo.UseShellExecute = false;
-                    p.Start();
-
-                    Console.WriteLine(p.StandardOutput);
+                    try
+                    {
+                        p.StartInfo.FileName = CLAmpLocation;
+                        p.StartInfo.Arguments = "/PLADD " + "\"" + (file as FileInfo).FullName + "\"";
+                        p.StartInfo.RedirectStandardOutput = true;
+                        p.StartInfo.UseShellExecute = false;
+                        p.StartInfo.CreateNoWindow = false;
+                        p.Start();
+                        p.WaitForExit();
+                    }
+                    catch (Exception e)
+                    {
+                        StreamWriter sw =
+                            new StreamWriter(@"log.txt");
+                        sw.WriteLine(e.Message);
+                    } //suppress
                 }
             }
 

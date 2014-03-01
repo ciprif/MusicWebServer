@@ -95,9 +95,18 @@ namespace MusicManager
         public MusicFile(FileInfo fileInfo)
         {
             ID = MusicManager.GiveValidID();
-            Fullpath = fileInfo.FullName;
-            FileInfo = fileInfo;
-            Filename = fileInfo.Name;
+            try
+            {
+                Fullpath = fileInfo.FullName;
+                FileInfo = fileInfo;
+                Filename = fileInfo.Name;
+            }
+            catch (Exception e)
+            {
+                StreamWriter sw =
+                  new StreamWriter(@"log.txt");
+                sw.WriteLine(e.Message);
+            } //suppress path to long exception
         }
     }
 }
