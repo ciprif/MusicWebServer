@@ -83,5 +83,12 @@ namespace MusicWebService
 
             musicManager.JumpToPos(percentage);
         }
+
+        public void RequestEnqueue(string fileId)
+        {
+            WebOperationContext.Current.OutgoingResponse.Headers.Add("Access-Control-Allow-Origin", "*");
+
+            musicManager.Enqueue(fileId);
+        }
     }
 }
