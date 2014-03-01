@@ -7,3 +7,4 @@ Backup/
 #Specific files
 UpgradeLog.htm
 *.suo
+config.ini

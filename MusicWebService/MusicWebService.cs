@@ -35,8 +35,12 @@ namespace MusicWebService
 
         public List<MusicFile> GetItems()
         {
+<<<<<<< HEAD
             musicManager.UpdateItems();
             registeredFiles = RegisteredFiles;
+=======
+            registeredFiles = musicManager.GetRegisteredFiles().ConvertAll(x => (MusicFile)x);
+>>>>>>> 741c9efdca11aea7bf32f5b57c77faf95c0efe21
 
             WebOperationContext.Current.OutgoingResponse.Headers.Add("Access-Control-Allow-Origin", "*");
 
