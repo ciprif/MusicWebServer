@@ -73,7 +73,7 @@ namespace MusicManager
         }
     }
     [DataContract]
-    public class MusicFile : IFile
+    public class MusicFile
     {
         [DataMember]
         public Int64 ID { get; set; }
@@ -82,14 +82,15 @@ namespace MusicManager
         [DataMember]
         public String Fullpath { get; set; }
         [DataMember]
-        public FileInfo FileInfo { get; set; }
+        public string Artist { get; set; }
+        [DataMember]
+        public string Title { get; set; }
 
         public MusicFile(String fullPath)
         {
             ID = MusicManager.GiveValidID();
             Fullpath = fullPath;
-            FileInfo = new FileInfo(fullPath);
-            Filename = FileInfo.Name;
+            Filename = new FileInfo(fullPath).Name;
         }
 
         public MusicFile(FileInfo fileInfo)
@@ -98,7 +99,6 @@ namespace MusicManager
             try
             {
                 Fullpath = fileInfo.FullName;
-                FileInfo = fileInfo;
                 Filename = fileInfo.Name;
             }
             catch (Exception e)

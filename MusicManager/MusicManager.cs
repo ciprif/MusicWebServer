@@ -109,7 +109,12 @@ namespace MusicManager
             {
                 if (extensions.Contains(file.Extension))
                 {
-                    registeredFiles.Add(new MusicFile(file));
+                    MusicFileTagInfo m = new MusicFileTagInfo(file.FullName);
+                    MusicFile f = new MusicFile(file); 
+                    f.Artist = m.Artist;
+                    f.Title = m.Title;
+
+                    registeredFiles.Add(f);
                 }
             }
 
@@ -122,11 +127,6 @@ namespace MusicManager
         public List<MusicFile> GetRegisteredFiles()
         {
             return registeredFiles;
-        }
-
-        public System.IO.FileInfo Find(string path)
-        {
-            return registeredFiles.Find(ByFilename(path)).FileInfo;
         }
 
         #endregion
@@ -335,6 +335,11 @@ namespace MusicManager
 
             System.Diagnostics.Process.Start(CLAmpLocation, "/JUMP " + miliseconds);
             SetupTimer();
+        }
+
+        public FileInfo Find(string path)
+        {
+            throw new NotImplementedException();
         }
     }
 }
