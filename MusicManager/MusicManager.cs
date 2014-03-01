@@ -8,9 +8,22 @@ using System.Windows.Input;
 using System.Windows;
 using System.Timers;
 using System.Threading;
+using System.Collections;
 
 namespace MusicManager
 {
+    public class pairIdVote
+    {
+        public int vote = 0;
+        public Int64 id;
+
+        public pairIdVote(int vote, Int64 id)
+        {
+            this.vote = vote;
+            this.id = id;
+        }
+    }
+
     public class MusicManager : IFileManager
     {
         private static List<MusicFile> registeredFiles;
@@ -20,11 +33,27 @@ namespace MusicManager
         private static string[] extensions = { ".mp3", ".wav", ".mp4" };
         private static Int64 currentID = 0;
         private static System.Timers.Timer trackTimer = new System.Timers.Timer();
+        private static List<pairIdVote> queue;
 
         public static string RootDirectory { get; set; }
         public static string CLAmpLocation { get; set; }
 
         #region GeneralFunction
+
+        //comparer
+        private class sortVoteDescendingHelper : Comparer<pairIdVote>
+        {
+            public override int Compare(pairIdVote a, pairIdVote b)
+            {
+                if (a.vote < b.vote)
+                    return 1;
+
+                if (a.vote > b.vote)
+                    return -1;
+                else
+                    return 0;
+            }
+        }
 
         /**
          * Constructor
@@ -47,6 +76,7 @@ namespace MusicManager
                 rootDir = OpenDir(RootDirectory);
 
                 PopulateList(rootDir);
+                queue = new List<pairIdVote>();
 
                 MusicManager.trackTimer.Elapsed += trackTimer_Elapsed;
             }
@@ -80,22 +110,6 @@ namespace MusicManager
                 if (extensions.Contains(file.Extension))
                 {
                     registeredFiles.Add(new MusicFile(file));
-                    try
-                    {
-                        p.StartInfo.FileName = CLAmpLocation;
-                        p.StartInfo.Arguments = "/PLADD " + "\"" + file.FullName + "\"";
-                        p.StartInfo.RedirectStandardOutput = true;
-                        p.StartInfo.UseShellExecute = false;
-                        p.StartInfo.CreateNoWindow = false;
-                        p.Start();
-                        p.WaitForExit();
-                    }
-                    catch (Exception e)
-                    {
-                        StreamWriter sw =
-                            new StreamWriter(@"log.txt");
-                        sw.WriteLine(e.Message);
-                    } //suppress
                 }
             }
 
@@ -168,7 +182,15 @@ namespace MusicManager
         */
         void trackTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            JumpToFile(((currentID + 1) % registeredFiles.Count).ToString());
+            if (queue.Count == 0)
+            {
+                JumpToFile(((currentID + 1) % registeredFiles.Count).ToString());
+            }
+            else
+            {
+                JumpToFile(((queue[0].id) % registeredFiles.Count).ToString());
+                queue.RemoveAt(0);
+            }
         }
 
         private static void SetupTimer()
@@ -222,6 +244,7 @@ namespace MusicManager
         public void PausePlayback()
         {
             System.Diagnostics.Process.Start(CLAmpLocation, "/PAUSE");
+            trackTimer.Stop();
             Console.WriteLine("pause");
         }
 
@@ -236,10 +259,33 @@ namespace MusicManager
             Int64 id = -1;
             if (Int64.TryParse(fileId, out id))
             {
-                System.Diagnostics.Process.Start(CLAmpLocation, "/PLSET " + (registeredFiles.FindIndex(MusicManager.ById(id)) + 1));
+                MusicFile file = (registeredFiles[registeredFiles.FindIndex(MusicManager.ById(id))]);
+                System.Diagnostics.Process.Start(CLAmpLocation, "/PLCLEAR").WaitForExit();
+                System.Diagnostics.Process.Start(CLAmpLocation, "/PLADD " + "\"" + file.Fullpath).WaitForExit(); //+ "\"" + "/PLSET " + 1
                 currentID = id;
                 PlayFile();
                 Console.WriteLine("jump to: {0}", registeredFiles.Find(MusicManager.ById(id)).Filename);
+            }
+        }
+
+        public void Enqueue(string fileId)
+        {
+            Int64 id = -1;
+            if (Int64.TryParse(fileId, out id))
+            {
+                if (queue.Exists(x => x.id == id))
+                {
+                    queue.Find(x => x.id == id).vote++;
+                }
+                else
+                {
+                    queue.Add(new pairIdVote(0, id));
+                }
+
+                queue.Sort(new sortVoteDescendingHelper());
+
+                if (queue.Count == 1)
+                        JumpToFile(queue[0].id.ToString());
             }
         }
 
@@ -287,7 +333,8 @@ namespace MusicManager
             double duration = CreateTagObject(currentID).Duration;
             int miliseconds =(int)((double.Parse(percentage) / 100) * duration * 1000);
 
-            System.Diagnostics.Process.Start(CLAmpLocation, "/PLAY /JUMP " + miliseconds);
+            System.Diagnostics.Process.Start(CLAmpLocation, "/JUMP " + miliseconds);
+            SetupTimer();
         }
     }
 }

@@ -92,6 +92,13 @@ namespace MusicWebService
             musicManager.JumpToPos(percentage);
         }
 
+        public void RequestEnqueue(string fileId)
+        {
+            WebOperationContext.Current.OutgoingResponse.Headers.Add("Access-Control-Allow-Origin", "*");
+
+            musicManager.Enqueue(fileId);
+        }
+
         public IEnumerable<MusicFile> GetItemsPaged(int page, int pageSize)
         {
             if ((page - 1) * pageSize > RegisteredFiles.Count - 1)

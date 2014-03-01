@@ -45,6 +45,10 @@ namespace MusicWebService
         [OperationContract(IsOneWay = true)]
         void RequestJumpToFile(string fileid);
 
+        [WebInvoke(Method = "POST", UriTemplate = "items/enqueue/{fileid}")]
+        [OperationContract(IsOneWay = true)]
+        void RequestEnqueue(string fileid);
+
         [WebInvoke(Method = "POST", UriTemplate = "items/jumpToPos/{percentage}")]
         [OperationContract(IsOneWay = true)]
         void RequestJumpToPos(string percentage);
