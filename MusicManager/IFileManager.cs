@@ -14,6 +14,9 @@ namespace MusicManager
     public interface IFileManager
     {
         List<MusicFile> GetRegisteredFiles();
+
+        List<MusicFile> GetQueuedFiles();
+
         FileInfo Find(String path);
     }
 }

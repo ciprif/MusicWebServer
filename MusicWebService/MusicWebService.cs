@@ -33,6 +33,20 @@ namespace MusicWebService
             }
         }
 
+        private List<MusicFile> queuedFiles = null;
+
+        private List<MusicFile> QueuedFiles
+        {
+            get
+            {
+                if (queuedFiles == null)
+                {
+                    queuedFiles = musicManager.GetQueuedFiles();
+                }
+                return queuedFiles;
+            }
+        }
+
         public List<MusicFile> GetItems()
         {
             musicManager.UpdateItems();
@@ -41,6 +55,16 @@ namespace MusicWebService
             WebOperationContext.Current.OutgoingResponse.Headers.Add("Access-Control-Allow-Origin", "*");
 
             return registeredFiles;
+        }
+
+        public List<MusicFile> GetQueuedItems()
+        {
+            //musicManager.UpdateItems();
+            //registeredFiles = RegisteredFiles;
+
+            WebOperationContext.Current.OutgoingResponse.Headers.Add("Access-Control-Allow-Origin", "*");
+
+            return musicManager.GetQueuedFiles();
         }
 
         public MusicFileTagInfo GetItem(string fileId)

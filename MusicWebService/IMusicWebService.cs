@@ -16,10 +16,14 @@ namespace MusicWebService
         [WebGet(UriTemplate="items")]
         [OperationContract] 
         List<MusicFile> GetItems();
-
+            
         [WebGet(UriTemplate = "GetItemsPaged?page={page}&pageSize={pageSize}")]
         [OperationContract]
         IEnumerable<MusicFile> GetItemsPaged(int page, int pageSize);
+
+        [WebGet(UriTemplate = "GetQueuedItems")]
+        [OperationContract]
+        List<MusicFile> GetQueuedItems();
 
         [WebGet(UriTemplate="items/{fileid}")]
         [OperationContract]

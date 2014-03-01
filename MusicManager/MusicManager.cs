@@ -17,16 +17,17 @@ namespace MusicManager
         public int vote = 0;
         public Int64 id;
 
-        public pairIdVote(int vote, Int64 id)
+        public pairIdVote(Int64 id, int vote)
         {
-            this.vote = vote;
             this.id = id;
+            this.vote = vote;            
         }
     }
 
     public class MusicManager : IFileManager
     {
         private static List<MusicFile> registeredFiles;
+        
         private static DirectoryInfo rootDir;
         private static MusicManager singleton = null;
         private static Int64 ID = 0;
@@ -129,6 +130,19 @@ namespace MusicManager
             return registeredFiles;
         }
 
+        public List<MusicFile> GetQueuedFiles()
+        {
+            var  queuedFiles = new List<MusicFile>();
+
+            foreach (var queuedItem in queue)
+            {
+                var musicFile = registeredFiles.Find(x => x.ID == queuedItem.id);
+                queuedFiles.Add(musicFile);
+            }
+
+            return queuedFiles;
+        }
+            
         #endregion
         
         #region Helpers
@@ -204,6 +218,8 @@ namespace MusicManager
             p.Start();
 
             string[] tokens = p.StandardOutput.ReadLine().Split('/');
+            ////mockup codruta
+            //string[] tokens = new string[] { "0:00", "0:00" };
             int length = 0;
 
             if (tokens.Length == 2)
@@ -279,7 +295,7 @@ namespace MusicManager
                 }
                 else
                 {
-                    queue.Add(new pairIdVote(0, id));
+                    queue.Add(new pairIdVote(id, 0));
                 }
 
                 queue.Sort(new sortVoteDescendingHelper());
@@ -300,6 +316,8 @@ namespace MusicManager
             p.Start();
 
             string[] tokens = p.StandardOutput.ReadLine().Split('/');
+            ////mockup codruta
+            //string[] tokens = new string[] { "0:00", "0:00" };
 
             if (tokens.Length == 2)
             {
