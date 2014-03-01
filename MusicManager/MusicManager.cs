@@ -109,7 +109,7 @@ namespace MusicManager
             {
                 if (extensions.Contains(file.Extension))
                 {
-                    registeredFiles.Add(new MusicFile(file as FileInfo));
+                    registeredFiles.Add(new MusicFile(file));
                 }
             }
 
@@ -119,9 +119,9 @@ namespace MusicManager
             }
         }
 
-        public List<IFile> GetRegisteredFiles()
+        public List<MusicFile> GetRegisteredFiles()
         {
-            return registeredFiles.ToList<IFile>();
+            return registeredFiles;
         }
 
         public System.IO.FileInfo Find(string path)
