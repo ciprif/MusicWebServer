@@ -107,6 +107,8 @@ namespace MusicWebService
                 currentPageSize = RegisteredFiles.Count - (page - 1) * pageSize;
             }
 
+            WebOperationContext.Current.OutgoingResponse.Headers.Add("Access-Control-Allow-Origin", "*");
+
             return RegisteredFiles.Skip((page - 1) * pageSize).Take(currentPageSize);
         }
     }
