@@ -58,7 +58,7 @@ namespace MusicManager
             try
             {
                 mp3File = new Mp3File(filePath);
-                Title = mp3File.TagHandler.Title;
+                Title = mp3File.TagHandler.Title.Replace("\0", "");
                 Album = mp3File.TagHandler.Album;
                 Artist = mp3File.TagHandler.Artist;
                 Year = mp3File.TagHandler.Year;

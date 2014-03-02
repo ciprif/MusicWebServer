@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.ServiceModel.Channels;
 using System.Text;
 using System.Threading.Tasks;
 using MusicManager;
@@ -116,11 +117,17 @@ namespace MusicWebService
             musicManager.JumpToPos(percentage);
         }
 
-        public void RequestEnqueue(string fileId)
+        public bool RequestEnqueue(string fileId)
         {
-            WebOperationContext.Current.OutgoingResponse.Headers.Add("Access-Control-Allow-Origin", "*");
+            var ipFilterManager = new IPFilterManager();
+            if (ipFilterManager.IsFilteredOut("RequestEnqueue",fileId))
+            {
+                return false;
+            }
 
+            WebOperationContext.Current.OutgoingResponse.Headers.Add("Access-Control-Allow-Origin", "*");
             musicManager.Enqueue(fileId);
+            return true;
         }
 
         public IEnumerable<MusicFile> GetItemsPaged(int page, int pageSize)
