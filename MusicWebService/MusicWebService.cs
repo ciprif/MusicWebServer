@@ -120,12 +120,13 @@ namespace MusicWebService
         public bool RequestEnqueue(string fileId)
         {
             var ipFilterManager = new IPFilterManager();
+            WebOperationContext.Current.OutgoingResponse.Headers.Add("Access-Control-Allow-Origin", "*");
+
             if (ipFilterManager.IsFilteredOut("RequestEnqueue",fileId))
             {
                 return false;
             }
 
-            WebOperationContext.Current.OutgoingResponse.Headers.Add("Access-Control-Allow-Origin", "*");
             musicManager.Enqueue(fileId);
             return true;
         }
